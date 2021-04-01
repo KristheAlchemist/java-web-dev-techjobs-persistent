@@ -33,8 +33,9 @@ public class HomeController {
 
     @RequestMapping("")
     public String index(Model model) {
-        model.addAttribute("jobs", jobRepository.findAll());
         model.addAttribute("title", "My Jobs");
+        model.addAttribute("jobs", jobRepository.findAll());
+        model.addAttribute("skills", skillRepository.findAll());
 
         return "index";
     }
@@ -42,6 +43,8 @@ public class HomeController {
     @GetMapping("add")
     public String displayAddJobForm(Model model) {
         model.addAttribute("title", "Add Job");
+        model.addAttribute("jobs", jobRepository.findAll());
+        model.addAttribute("skills", skillRepository.findAll());
         model.addAttribute("employers", employerRepository.findAll());
         model.addAttribute(new Job());
         return "add";
@@ -59,7 +62,7 @@ public class HomeController {
         }
 
         Optional<Employer> optEmployer = employerRepository.findById(employerId);
-        Employer employer = (Employer) optEmployer.get();
+        Employer employer = optEmployer.get();
         newJob.setEmployer(employer);
         List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
         newJob.setSkills(skillObjs);
