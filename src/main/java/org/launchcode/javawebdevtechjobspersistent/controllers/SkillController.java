@@ -37,18 +37,17 @@ public class SkillController {
         if (errors.hasErrors()) {
             return "skills/add";
         }
-
         skillRepository.save(newSkill);
         return "redirect:";
     }
 
-    @GetMapping("view/{employerId}")
-    public String displayViewEmployer(Model model, @PathVariable int employerId) {
+    @GetMapping("view/{skillId}")
+    public String displayViewSkill(Model model, @PathVariable int employerId) {
 
         Optional optSkill = skillRepository.findById(employerId);
         if (optSkill.isPresent()) {
             Skill skill = (Skill) optSkill.get();
-            model.addAttribute("jobs", skill);
+            model.addAttribute("skill", skill);
             return "skills/view";
         } else {
             return "redirect:../";
