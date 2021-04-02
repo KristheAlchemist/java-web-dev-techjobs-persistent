@@ -35,7 +35,6 @@ public class HomeController {
     public String index(Model model) {
         model.addAttribute("title", "My Jobs");
         model.addAttribute("jobs", jobRepository.findAll());
-        model.addAttribute("skills", skillRepository.findAll());
 
         return "index";
     }
@@ -43,7 +42,6 @@ public class HomeController {
     @GetMapping("add")
     public String displayAddJobForm(Model model) {
         model.addAttribute("title", "Add Job");
-        model.addAttribute("jobs", jobRepository.findAll());
         model.addAttribute("skills", skillRepository.findAll());
         model.addAttribute("employers", employerRepository.findAll());
         model.addAttribute(new Job());
@@ -52,23 +50,28 @@ public class HomeController {
 
     @PostMapping("add")
     public String processAddJobForm(@ModelAttribute @Valid Job newJob,
-                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam(required=false) List<Integer> skills) {
-        model.addAttribute("skills", skillRepository.findAll());
+                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
         if (errors.hasErrors()) {
             model.addAttribute("title", "Add Job");
-            model.addAttribute("employers", employerRepository.findAll());
-            model.addAttribute("skills", skillRepository.findAll());
+            model.addAttribute("employers", employerRepository.findById(employerId));
+//            model.addAttribute("skills", skillRepository.findById(employerId));
+
             return "add";
         }
 
         Optional<Employer> optEmployer = employerRepository.findById(employerId);
-        Employer employer = optEmployer.get();
-        newJob.setEmployer(employer);
-        List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
-        newJob.setSkills(skillObjs);
 
-        jobRepository.save(newJob);
+        if (optEmployer.isPresent()) {
 
+            newJob.setEmployer(optEmployer.get());
+            List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+            newJob.setSkills(skillObjs);
+            model.addAttribute("job", newJob);
+
+            jobRepository.save(newJob);
+
+//            return "redirect:";
+        }
         return "redirect:";
     }
 
@@ -80,6 +83,7 @@ public class HomeController {
             model.addAttribute("job", job);
             return "view";
         } else {
+            model.addAttribute("jobs", jobRepository.findAll());
             return "redirect:../";
         }
 
